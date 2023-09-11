@@ -1,0 +1,45 @@
+# import 'enum.graphql'
+# import 'scalar.graphql'
+# import 'type.graphql'
+# import 'input.graphql'
+
+type Query {
+  """
+  User 페이지네이션 쿼리
+  """
+  users(
+    """
+    Returns the elements in the list that come after the specified cursor
+    """
+    after: String
+
+    """
+    Returns the first n elements from the list.
+    """
+    first: Int!
+
+    """
+    검색 텍스트
+    """
+    searchText: String
+  ): UserConnection
+  user(id: ID!): User
+  me: User
+  todo(id: ID!): Todo
+  todos(searchText: String): [Todo!]!
+}
+
+type Mutation {
+  createTodo(title: String!, description: String): Todo
+  updateTodo(id: ID!, title: String, description: String): Todo
+  deleteTodo(id: ID!): Todo
+
+  signIn(email: String!, password: String!): AuthPayload
+  signUp(user: UserCreateInput!): AuthPayload
+  updateMe(user: UserUpdateInput!): User
+}
+
+type Subscription {
+  userSignedIn(userId: String!): User
+  userUpdated(userId: String!): User
+}

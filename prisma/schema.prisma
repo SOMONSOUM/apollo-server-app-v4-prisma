@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum AuthType {
+  email
+  facebook
+  google
+  apple
+}
+
+model User {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String    @unique @db.VarChar(255)
+  password    String?   @db.VarChar(255)
+  name        String?   @db.VarChar(255)
+  displayName String?   @map("display_name") @db.VarChar(255)
+  thumbUrl    String?   @map("thumb_url") @db.VarChar(255)
+  photoUrl    String?   @map("photo_url") @db.VarChar(255)
+  birthday    DateTime? @map("birth_day") @db.Date
+  gender      Gender?
+  phone       String?   @db.VarChar(255)
+  verifiedAt  DateTime? @map("verified_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  todos    Todo[]
+  settings Settings?
+
+  @@map("users")
+}
+
+model Settings {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  socialId     String?   @map("social_id")
+  authType     AuthType? @map("auth_type")
+  refreshToken String?   @map("refresh_token")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id") @db.Uuid
+
+  @@map("settings")
+}
+
+model Todo {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String   @db.VarChar(255)
+  description String?
+  completed   Boolean? @default(false)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id") @db.Uuid
+
+  @@map("todos")
+}
